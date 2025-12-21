@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	http "github.com/bogdanfinn/fhttp"
 	"io/ioutil"
 	"log"
 	"math/rand"
-	"net/http"
 	"net/url"
 	"os"
 	"strconv"
@@ -15,6 +15,14 @@ import (
 
 	"github.com/fatih/color"
 )
+
+// HttpClient interface
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+	Get(url string) (*http.Response, error)
+	PostForm(url string, data url.Values) (*http.Response, error)
+	SetCookieJar(jar http.CookieJar)
+}
 
 // CHA map
 const CHA = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -73,7 +81,7 @@ func YesOrNo(note string) bool {
 }
 
 // GetBody read body
-func GetBody(client *http.Client, URL string) ([]byte, error) {
+func GetBody(client HttpClient, URL string) ([]byte, error) {
 	resp, err := client.Get(URL)
 	if err != nil {
 		return nil, err
@@ -83,7 +91,7 @@ func GetBody(client *http.Client, URL string) ([]byte, error) {
 }
 
 // PostBody read post body
-func PostBody(client *http.Client, URL string, data url.Values) ([]byte, error) {
+func PostBody(client HttpClient, URL string, data url.Values) ([]byte, error) {
 	resp, err := client.PostForm(URL, data)
 	if err != nil {
 		return nil, err
@@ -93,7 +101,7 @@ func PostBody(client *http.Client, URL string, data url.Values) ([]byte, error) 
 }
 
 // GetJSONBody read json body
-func GetJSONBody(client *http.Client, url string) (map[string]interface{}, error) {
+func GetJSONBody(client HttpClient, url string) (map[string]interface{}, error) {
 	resp, err := client.Get(url)
 	if err != nil {
 		return nil, err

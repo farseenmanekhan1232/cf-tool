@@ -1,22 +1,25 @@
 package client
 
 import (
+	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"io"
 	"net/url"
 	"regexp"
-	"syscall"
+	"strings"
+	"time"
 
+	http "github.com/bogdanfinn/fhttp"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/chromedp"
 	"github.com/fatih/color"
 	"github.com/xalanq/cf-tool/cookiejar"
 	"github.com/xalanq/cf-tool/util"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 // genFtaa generate a random one
@@ -61,7 +64,7 @@ func (c *Client) Login() (err error) {
 	}
 
 	jar, _ := cookiejar.New(nil)
-	c.client.Jar = jar
+	c.client.SetCookieJar(jar)
 	body, err := util.GetBody(c.client, c.host+"/enter")
 	if err != nil {
 		return
@@ -159,41 +162,115 @@ func (c *Client) DecryptPassword() (string, error) {
 	return decrypt(c.HandleOrEmail, c.Password)
 }
 
-// ConfigLogin configure handle and password
+// ConfigLogin configure login via browser
 func (c *Client) ConfigLogin() (err error) {
 	if c.Handle != "" {
 		color.Green("Current user: %v", c.Handle)
 	}
-	color.Cyan("Configure handle/email and password")
-	color.Cyan("Note: The password is invisible, just type it correctly.")
+	return c.LoginBrowser()
+}
 
-	fmt.Printf("handle/email: ")
-	handleOrEmail := util.ScanlineTrim()
+// LoginBrowser opens Chrome browser for user to login
 
-	password := ""
-	if terminal.IsTerminal(int(syscall.Stdin)) {
-		fmt.Printf("password: ")
-		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
-		if err != nil {
-			fmt.Println()
-			if err.Error() == "EOF" {
-				fmt.Println("Interrupted.")
-				return nil
+func (c *Client) LoginBrowser() (err error) {
+	color.Cyan("Opening browser for Codeforces login...")
+	color.Cyan("Please log in to Codeforces in the browser window.")
+	color.Cyan("The window will close automatically after login is detected.")
+
+	// Create a new browser context with visible window and stealth options
+	opts := append(chromedp.DefaultExecAllocatorOptions[:],
+		chromedp.Flag("headless", false),
+		chromedp.Flag("disable-gpu", false),
+		chromedp.Flag("start-maximized", true),
+		// Stealth options to avoid automation detection
+		chromedp.Flag("disable-blink-features", "AutomationControlled"),
+		chromedp.Flag("exclude-switches", "enable-automation"),
+		chromedp.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"),
+	)
+
+	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer cancel()
+
+	ctx, cancel := chromedp.NewContext(allocCtx)
+	defer cancel()
+
+	// Quick test to see if Chrome is available
+	if err := chromedp.Run(ctx); err != nil {
+		color.Red("Could not launch Chrome/Chromium browser.")
+		color.Yellow("Please install one of the following:")
+		color.Yellow("  • Google Chrome: https://www.google.com/chrome/")
+		color.Yellow("  • Chromium (lightweight): https://www.chromium.org/getting-involved/download-chromium/")
+		return err
+	}
+
+	// Set a timeout for the entire operation
+	ctx, cancel = context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+
+	var cookies []*network.Cookie
+
+	// Navigate to login page and wait for successful login
+	err = chromedp.Run(ctx,
+		chromedp.Navigate(c.host+"/enter"),
+		// Wait for successful login by checking for handle in page
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			for {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+					// Check if logged in by looking for handle element
+					var handle string
+					err := chromedp.Evaluate(`
+						(function() {
+							var el = document.querySelector('a[href^="/profile/"]');
+							if (el) return el.textContent.trim();
+							return '';
+						})()
+					`, &handle).Do(ctx)
+					if err == nil && handle != "" {
+						color.Green("Detected login as: %v", handle)
+						c.Handle = handle
+						return nil
+					}
+					time.Sleep(500 * time.Millisecond)
+				}
 			}
+		}),
+		// Extract all cookies
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			var err error
+			cookies, err = network.GetCookies().Do(ctx)
 			return err
-		}
-		password = string(bytePassword)
-		fmt.Println()
-	} else {
-		color.Red("Your terminal does not support the hidden password.")
-		fmt.Printf("password: ")
-		password = util.Scanline()
+		}),
+	)
+
+	if err != nil {
+		color.Red("Browser login failed: %v", err)
+		return err
 	}
 
-	c.HandleOrEmail = handleOrEmail
-	c.Password, err = encrypt(handleOrEmail, password)
-	if err != nil {
-		return
+	// Convert cookies to jar format
+	jar, _ := cookiejar.New(nil)
+	u, _ := url.Parse(c.host)
+	httpCookies := []*http.Cookie{}
+
+	for _, cookie := range cookies {
+		if strings.Contains(c.host, cookie.Domain) || cookie.Domain == ".codeforces.com" || cookie.Domain == "codeforces.com" {
+			httpCookies = append(httpCookies, &http.Cookie{
+				Name:   cookie.Name,
+				Value:  cookie.Value,
+				Domain: cookie.Domain,
+				Path:   cookie.Path,
+			})
+		}
 	}
-	return c.Login()
+
+	jar.SetCookies(u, httpCookies)
+	c.client.SetCookieJar(jar)
+	c.Jar = jar
+
+	color.Green("Succeed!!")
+	color.Green("Welcome %v~", c.Handle)
+	return c.save()
 }

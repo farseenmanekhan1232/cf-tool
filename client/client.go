@@ -2,14 +2,19 @@ package client
 
 import (
 	"encoding/json"
+	http "github.com/bogdanfinn/fhttp"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings" // Added strings import
 
 	"github.com/fatih/color"
 	"github.com/xalanq/cf-tool/cookiejar"
+	"github.com/xalanq/cf-tool/util"
+
+	tls_client "github.com/bogdanfinn/tls-client"
+	"github.com/bogdanfinn/tls-client/profiles"
 )
 
 // Client codeforces client
@@ -24,11 +29,45 @@ type Client struct {
 	host           string
 	proxy          string
 	path           string
-	client         *http.Client
+	client         util.HttpClient
+	UserAgent      string `json:"user_agent"`
 }
 
 // Instance global client
 var Instance *Client
+
+type TlsClientWrapper struct {
+	client tls_client.HttpClient
+	c      *Client
+}
+
+func (w *TlsClientWrapper) Do(req *http.Request) (*http.Response, error) {
+	if w.c.UserAgent != "" {
+		req.Header.Set("User-Agent", w.c.UserAgent)
+	}
+	return w.client.Do(req)
+}
+
+func (w *TlsClientWrapper) Get(url string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	return w.Do(req)
+}
+
+func (w *TlsClientWrapper) PostForm(url string, data url.Values) (*http.Response, error) {
+	req, err := http.NewRequest("POST", url, strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	return w.client.Do(req)
+}
+
+func (w *TlsClientWrapper) SetCookieJar(jar http.CookieJar) {
+	w.client.SetCookieJar(jar)
+}
 
 // Init initialize
 func Init(path, host, proxy string) {
@@ -38,17 +77,25 @@ func Init(path, host, proxy string) {
 		color.Red(err.Error())
 		color.Green("Create a new session in %v", path)
 	}
-	Proxy := http.ProxyFromEnvironment
-	if len(proxy) > 0 {
-		proxyURL, err := url.Parse(proxy)
-		if err != nil {
-			color.Red(err.Error())
-			color.Green("Use default proxy from environment")
-		} else {
-			Proxy = http.ProxyURL(proxyURL)
-		}
+
+	options := []tls_client.HttpClientOption{
+		tls_client.WithTimeoutSeconds(30),
+		tls_client.WithClientProfile(profiles.Chrome_133),
+		tls_client.WithNotFollowRedirects(),
+		tls_client.WithCookieJar(c.Jar), // Use shared cookie jar
 	}
-	c.client = &http.Client{Jar: c.Jar, Transport: &http.Transport{Proxy: Proxy}}
+
+	if len(proxy) > 0 {
+		options = append(options, tls_client.WithProxyUrl(proxy))
+	}
+
+	client, err := tls_client.NewHttpClient(tls_client.NewNoopLogger(), options...)
+	if err != nil {
+		color.Red(err.Error())
+		return
+	}
+
+	c.client = &TlsClientWrapper{client: client, c: c}
 	if err := c.save(); err != nil {
 		color.Red(err.Error())
 	}

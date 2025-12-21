@@ -41,14 +41,19 @@ Then enjoy the cf-tool~
 Or you can compile it from the source **(go >= 1.12)**:
 
 ```plain
-$ go get github.com/xalanq/cf-tool
-$ cd $GOPATH/src/github.com/xalanq/cf-tool
-$ go build -ldflags "-s -w" cf.go
+$ git clone https://github.com/xalanq/cf-tool
+$ cd cf-tool
+$ go build -ldflags "-s -w" -o cf .
 ```
 
-If you don't know what's the `$GOPATH`, please see here <https://github.com/golang/go/wiki/GOPATH>.
+## Requirements
+
+* **Google Chrome or Chromium** - Required for login (the tool uses browser automation to bypass Cloudflare protection)
+  * [Download Chrome](https://www.google.com/chrome/)
+  * [Download Chromium](https://www.chromium.org/getting-involved/download-chromium/)
 
 ## Usage
+
 
 Let's simulate a competition.
 
