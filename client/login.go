@@ -167,7 +167,7 @@ func (c *Client) ConfigLogin() (err error) {
 	if c.Handle != "" {
 		color.Green("Current user: %v", c.Handle)
 	}
-	return c.LoginBrowser()
+	return c.LoginBrowserLocal()
 }
 
 // LoginBrowser opens Chrome browser for user to login
