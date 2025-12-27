@@ -14,7 +14,6 @@ import (
 	"time"
 
 	http "github.com/bogdanfinn/fhttp"
-	"github.com/atotto/clipboard"
 	"github.com/fatih/color"
 	"github.com/xalanq/cf-tool/cookiejar"
 )
@@ -89,15 +88,6 @@ func (c *Client) LoginBrowserLocal() error {
 
 	time.Sleep(100 * time.Millisecond)
 
-	// Create the bookmarklet JS (fallback for users without extension)
-	bookmarkletJS := fmt.Sprintf(
-		`(function(){var h=document.querySelector('a[href^="/profile/"]');if(!h){alert('Please log in first!');return;}fetch('http://localhost:%d/callback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cookies:document.cookie,handle:h.textContent.trim()})}).then(()=>alert('✓ Sent to cf-tool!')).catch(e=>alert('Error: '+e))})()`,
-		port,
-	)
-
-	// Try to copy to clipboard
-	clipboardErr := clipboard.WriteAll(bookmarkletJS)
-
 	// Open browser to Codeforces with port parameter for extension
 	loginURL := fmt.Sprintf("%s?cf_port=%d", c.host, port)
 	if err := openBrowser(loginURL); err != nil {
@@ -111,18 +101,13 @@ func (c *Client) LoginBrowserLocal() error {
 	color.Cyan("╚══════════════════════════════════════════════════════════════╝")
 	fmt.Println()
 
-	color.HiGreen("🔌 With CF-Tool Extension: Login completes automatically!")
-	color.White("   Install: github.com/farseenmanekhan1232/cf-tool/extension")
+	color.HiGreen("🔌 Login will complete automatically with the CF-Tool extension!")
 	fmt.Println()
-
-	color.Yellow("📋 Without Extension:")
-	color.White("   1. Log in to Codeforces")
-	color.White("   2. Open Console (Cmd+Option+J / F12)")
-	color.White("   3. Paste:")
-	if clipboardErr == nil {
-		color.Green("      (copied to clipboard)")
-	}
-	color.HiCyan("      %s", bookmarkletJS)
+	color.White("   1. Log in to Codeforces in the browser")
+	color.White("   2. That's it! The extension handles the rest.")
+	fmt.Println()
+	color.Yellow("   Don't have the extension?")
+	color.White("   Install: https://github.com/farseenmanekhan1232/cf-tool/extension")
 	fmt.Println()
 
 	color.Cyan("────────────────────────────────────────────────────────────────")
