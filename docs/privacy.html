@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - CF-Tool Login Helper</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        h1 { color: #1a1a2e; margin-bottom: 10px; }
+        h2 { color: #16213e; margin: 30px 0 15px; }
+        .last-updated { color: #666; font-size: 14px; margin-bottom: 30px; }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        p { margin-bottom: 15px; }
+        ul { margin: 15px 0 15px 30px; }
+        li { margin: 8px 0; }
+        a { color: #667eea; }
+        .highlight {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last updated: December 27, 2024</p>
+
+        <p>This privacy policy describes how the <strong>CF-Tool Login Helper</strong> Chrome extension handles your data.</p>
+
+        <div class="highlight">
+            <strong>TL;DR:</strong> This extension only communicates with your local machine. No data is ever sent to external servers.
+        </div>
+
+        <h2>What Data We Collect</h2>
+        <p>The extension accesses the following data <strong>only when you initiate a login through cf-tool CLI</strong>:</p>
+        <ul>
+            <li><strong>Session Cookies:</strong> Codeforces session cookies (required to authenticate cf-tool)</li>
+            <li><strong>Username:</strong> Your Codeforces handle (displayed on the page)</li>
+        </ul>
+
+        <h2>How We Use Your Data</h2>
+        <p>The collected data is used <strong>exclusively</strong> to:</p>
+        <ul>
+            <li>Transfer your authenticated Codeforces session to the cf-tool CLI running on your local machine</li>
+        </ul>
+
+        <h2>Where Your Data Goes</h2>
+        <p>Your data is sent <strong>only to localhost</strong> (your own computer):</p>
+        <ul>
+            <li>The extension sends cookies to <code>http://localhost:{port}/callback</code></li>
+            <li>The {port} is dynamically assigned by cf-tool on your machine</li>
+            <li><strong>No data is ever sent to external servers</strong></li>
+            <li><strong>No data is stored by the extension</strong></li>
+        </ul>
+
+        <h2>Permissions Explained</h2>
+        <ul>
+            <li><strong>codeforces.com access:</strong> To read your login status and cookies</li>
+            <li><strong>localhost access:</strong> To send cookies to cf-tool running on your machine</li>
+            <li><strong>cookies permission:</strong> To read authentication cookies from Codeforces</li>
+        </ul>
+
+        <h2>Third-Party Services</h2>
+        <p>This extension does not use any third-party services, analytics, or tracking.</p>
+
+        <h2>Data Retention</h2>
+        <p>The extension does not store any data. Cookies are read and immediately sent to localhost, then discarded.</p>
+
+        <h2>Open Source</h2>
+        <p>This extension is open source. You can review the complete source code at:</p>
+        <p><a href="https://github.com/farseenmanekhan1232/cf-tool/tree/master/extension">github.com/farseenmanekhan1232/cf-tool/extension</a></p>
+
+        <h2>Contact</h2>
+        <p>For questions about this privacy policy, please open an issue on GitHub or contact:</p>
+        <p>Email: <a href="mailto:farseenmanekhan1232@gmail.com">farseenmanekhan1232@gmail.com</a></p>
+
+        <h2>Changes to This Policy</h2>
+        <p>Any changes to this privacy policy will be posted on this page with an updated date.</p>
+    </div>
+</body>
+</html>
