@@ -48,9 +48,21 @@ $ go build -ldflags "-s -w" -o cf .
 
 ## Requirements
 
-* **Google Chrome or Chromium** - Required for login (the tool uses browser automation to bypass Cloudflare protection)
-  * [Download Chrome](https://www.google.com/chrome/)
-  * [Download Chromium](https://www.chromium.org/getting-involved/download-chromium/)
+* **Google Chrome or any modern browser** - Required for login (see Login section below)
+
+## Login
+
+To login to Codeforces, run `cf config` and select option `0` (login).
+
+The tool will:
+1. Open your default browser to codeforces.com
+2. Display a JavaScript snippet (auto-copied to clipboard)
+3. After logging in, open DevTools Console (`Cmd+Option+J` on Mac, `F12` on Windows/Linux)
+4. Paste the snippet and press Enter
+
+This approach bypasses Cloudflare's bot detection by using your real browser instead of automation.
+
+> **Note**: The JavaScript sends your session cookies to a local server running on your machine. Your credentials never leave your computer.
 
 ## Usage
 
