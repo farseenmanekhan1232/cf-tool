@@ -54,15 +54,24 @@ $ go build -ldflags "-s -w" -o cf .
 
 To login to Codeforces, run `cf config` and select option `0` (login).
 
-The tool will:
-1. Open your default browser to codeforces.com
-2. Display a JavaScript snippet (auto-copied to clipboard)
-3. After logging in, open DevTools Console (`Cmd+Option+J` on Mac, `F12` on Windows/Linux)
-4. Paste the snippet and press Enter
+### Option 1: Chrome Extension (Recommended)
 
-This approach bypasses Cloudflare's bot detection by using your real browser instead of automation.
+Install the [CF-Tool Login Helper](https://github.com/farseenmanekhan1232/cf-tool/tree/master/extension) extension:
 
-> **Note**: The JavaScript sends your session cookies to a local server running on your machine. Your credentials never leave your computer.
+1. Download the `extension` folder from this repo
+2. Go to `chrome://extensions/` and enable Developer Mode
+3. Click "Load unpacked" and select the extension folder
+
+**With the extension installed, login is automatic!** Just sign in to Codeforces and you're done.
+
+### Option 2: Manual (No Extension)
+
+If you don't have the extension:
+1. Log in to Codeforces in the browser
+2. Open DevTools Console (`Cmd+Option+J` on Mac, `F12` on Windows/Linux)
+3. Paste the code snippet (auto-copied to clipboard) and press Enter
+
+> **Note**: Your credentials never leave your computer - cookies are sent only to localhost.
 
 ## Usage
 

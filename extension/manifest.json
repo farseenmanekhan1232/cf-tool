@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "CF-Tool Login Helper",
+  "version": "1.0.0",
+  "description": "Automatically transfers Codeforces login session to cf-tool CLI",
+  "permissions": [
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://codeforces.com/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://codeforces.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
