@@ -56,11 +56,7 @@ To login to Codeforces, run `cf config` and select option `0` (login).
 
 ### Option 1: Chrome Extension (Recommended)
 
-Install the [CF-Tool Login Helper](https://github.com/farseenmanekhan1232/cf-tool/tree/master/extension) extension:
-
-1. Download the `extension` folder from this repo
-2. Go to `chrome://extensions/` and enable Developer Mode
-3. Click "Load unpacked" and select the extension folder
+Install the **[CF-Tool Login Helper](https://chromewebstore.google.com/detail/cf-tool-login-helper/lphndghbifbjefmhoejdpconiehgnkfp)** from the Chrome Web Store.
 
 **With the extension installed, login is automatic!** Just sign in to Codeforces and you're done.
 
