@@ -7,254 +7,134 @@
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.12-green.svg)](https://github.com/golang)
 [![license](https://img.shields.io/badge/license-MIT-%23373737.svg)](https://raw.githubusercontent.com/xalanq/cf-tool/master/LICENSE)
 
-Codeforces Tool is a command-line interface tool for [Codeforces](https://codeforces.com).
-
-It's fast, small, cross-platform and powerful.
+A fast, small, cross-platform and powerful command-line tool for [Codeforces](https://codeforces.com).
 
 [Installation](#installation) | [Usage](#usage) | [FAQ](#faq) | [中文](./README_zh_CN.md)
 
 ## Features
 
-* Support Contests, Gym, Groups and acmsguru.
-* Support all programming languages in Codeforces.
-* Submit codes.
-* Watch submissions' status dynamically.
-* Fetch problems' samples.
-* Compile and test locally.
-* Clone all codes of someone.
-* Generate codes from the specified template (including timestamp, author, etc.)
-* List problems' stats of one contest.
-* Use default web browser to open problems' pages, standings' page, etc.
-* Setup a network proxy. Setup a mirror host.
-* Colorful CLI.
+- **Contest Support** - Contests, Gym, Groups and acmsguru
+- **All Languages** - Every programming language on Codeforces
+- **Full Workflow** - Submit code, watch status, fetch samples, compile & test locally
+- **Code Management** - Clone submissions, generate from templates, pull AC solutions
+- **Browser Integration** - Open problems, standings, and submissions in your browser
+- **Networking** - Proxy and mirror host support
+- **Colorful CLI** - Beautiful terminal output
 
-Pull requests are always welcome.
+Pull requests are always welcome!
 
 ![](./assets/readme_1.gif)
 
 ## Installation
 
-You can download the pre-compiled binary file in [here](https://github.com/xalanq/cf-tool/releases).
+Download the pre-compiled binary from [Releases](https://github.com/xalanq/cf-tool/releases).
 
-Then enjoy the cf-tool~
+Or build from source **(go >= 1.12)**:
 
-Or you can compile it from the source **(go >= 1.12)**:
-
-```plain
-$ git clone https://github.com/xalanq/cf-tool
-$ cd cf-tool
-$ go build -ldflags "-s -w" -o cf .
+```bash
+git clone https://github.com/xalanq/cf-tool
+cd cf-tool
+go build -ldflags "-s -w" -o cf .
 ```
-
-## Requirements
-
-* **Google Chrome or any modern browser** - Required for login (see Login section below)
 
 ## Login
 
-To login to Codeforces, run `cf config` and select option `0` (login).
+Run `cf config` and select option `0` (login).
 
 ### Option 1: Chrome Extension (Recommended)
 
-Install the **[CF-Tool Login Helper](https://chromewebstore.google.com/detail/cf-tool-login-helper/lphndghbifbjefmhoejdpconiehgnkfp)** from the Chrome Web Store.
+Install **[CF-Tool Login Helper](https://chromewebstore.google.com/detail/cf-tool-login-helper/lphndghbifbjefmhoejdpconiehgnkfp)** - login is automatic once installed!
 
-**With the extension installed, login is automatic!** Just sign in to Codeforces and you're done.
+### Option 2: Manual
 
-### Option 2: Manual (No Extension)
-
-If you don't have the extension:
-1. Log in to Codeforces in the browser
+1. Log in to Codeforces in your browser
 2. Open DevTools Console (`Cmd+Option+J` on Mac, `F12` on Windows/Linux)
 3. Paste the code snippet (auto-copied to clipboard) and press Enter
 
-> **Note**: Your credentials never leave your computer - cookies are sent only to localhost.
+> Your credentials never leave your computer - cookies are sent only to localhost.
 
 ## Usage
 
+### Quick Start: Racing a Contest
 
-Let's simulate a competition.
-
- `cf race 1136` or `cf race https://codeforces.com/contest/1136`
-
-To start competing the contest 1136!
-
-If the contest has not started yet, `cf` will count down. If the contest have started or the countdown ends, `cf` will use the default browser to open dashboard's page and problems' page, and fetch all samples to the local.
-
- `cd ./cf/contest/1136/a` (May be different from this, please notice the message on your screen)
-
-Enter the directory of problem A, the directory should contain all samples of the problem.
-
- `cf gen` 
-
-Generate a code with the default template. The filename of the code is problem id by default.
-
- `vim a.cpp` 
-
-Use Vim to write the code (It depends on yourself).
-
- `cf test` 
-
-Compile and test all samples.
-
- `cf submit` 
-
-Submit the code.
-
- `cf list` 
-
-List problems' stats of the contest.
-
- `cf stand` 
-
-Open the standings' page of the contest.
-
-```plain
-You should run "cf config" to configure your handle, password and code
-templates at first.
-
-If you want to compete, the best command is "cf race".
-
-Usage:
-  cf config
-  cf submit [-f <file>] [<specifier>...]
-  cf list [<specifier>...]
-  cf parse [<specifier>...]
-  cf gen [<alias>]
-  cf test [<file>]
-  cf watch [all] [<specifier>...]
-  cf open [<specifier>...]
-  cf stand [<specifier>...]
-  cf sid [<specifier>...]
-  cf race [<specifier>...]
-  cf pull [ac] [<specifier>...]
-  cf clone [ac] [<handle>]
-  cf upgrade
-
-Options:
-  -h --help            Show this screen.
-  --version            Show version.
-  -f <file>, --file <file>, <file>
-                       Path to file. E.g. "a.cpp", "./temp/a.cpp"
-  <specifier>          Any useful text. E.g.
-                       "https://codeforces.com/contest/100",
-                       "https://codeforces.com/contest/180/problem/A",
-                       "https://codeforces.com/group/Cw4JRyRGXR/contest/269760",
-                       "1111A", "1111", "a", "Cw4JRyRGXR"
-                       You can combine multiple specifiers to specify what you
-                       want.
-  <alias>              Template's alias. E.g. "cpp"
-  ac                   The status of the submission is Accepted.
-
-Examples:
-  cf config            Configure the cf-tool.
-  cf submit            cf will detect what you want to submit automatically.
-  cf submit -f a.cpp
-  cf submit https://codeforces.com/contest/100/A
-  cf submit -f a.cpp 100A 
-  cf submit -f a.cpp 100 a
-  cf submit contest 100 a
-  cf submit gym 100001 a
-  cf list              List all problems' stats of a contest.
-  cf list 1119
-  cf parse 100         Fetch all problems' samples of contest 100 into
-                       "{cf}/{contest}/100/".
-  cf parse gym 100001a
-                       Fetch samples of problem "a" of gym 100001 into
-                       "{cf}/{gym}/100001/a".
-  cf parse gym 100001
-                       Fetch all problems' samples of gym 100001 into
-                       "{cf}/{gym}/100001".
-  cf parse             Fetch samples of current problem into current path.
-  cf gen               Generate a code from default template.
-  cf gen cpp           Generate a code from the template whose alias is "cpp"
-                       into current path.
-  cf test              Run the commands of a template in current path. Then
-                       test all samples. If you want to add a new testcase,
-                       create two files "inK.txt" and "ansK.txt" where K is
-                       a string with 0~9.
-  cf watch             Watch the first 10 submissions of current contest.
-  cf watch all         Watch all submissions of current contest.
-  cf open 1136a        Use default web browser to open the page of contest
-                       1136, problem a.
-  cf open gym 100136   Use default web browser to open the page of gym
-                       100136.
-  cf stand             Use default web browser to open the standing page.
-  cf sid 52531875      Use default web browser to open the submission
-                       52531875's page.
-  cf sid               Open the last submission's page.
-  cf race 1136         If the contest 1136 has not started yet, it will
-                       countdown. When the countdown ends, it will open all
-                       problems' pages and parse samples.
-  cf pull 100          Pull all problems' latest codes of contest 100 into
-                       "./100/<problem-id>".
-  cf pull 100 a        Pull the latest code of problem "a" of contest 100 into
-                       "./100/<problem-id>".
-  cf pull ac 100 a     Pull the "Accepted" or "Pretests passed" code of problem
-                       "a" of contest 100.
-  cf pull              Pull the latest codes of current problem into current
-                       path.
-  cf clone xalanq      Clone all codes of xalanq.
-  cf upgrade           Upgrade the "cf" to the latest version from GitHub.
-
-File:
-  cf will save some data in some files:
-
-  "~/.cf/config"        Configuration file, including templates, etc.
-  "~/.cf/session"       Session file, including cookies, handle, password, etc.
-
-  "~" is the home directory of current user in your system.
-
-Template:
-  You can insert some placeholders into your template code. When generate a code
-  from the template, cf will replace all placeholders by following rules:
-
-  $%U%$   Handle (e.g. xalanq)
-  $%Y%$   Year   (e.g. 2019)
-  $%M%$   Month  (e.g. 04)
-  $%D%$   Day    (e.g. 09)
-  $%h%$   Hour   (e.g. 08)
-  $%m%$   Minute (e.g. 05)
-  $%s%$   Second (e.g. 00)
-
-Script in template:
-  Template will run 3 scripts in sequence when you run "cf test":
-    - before_script   (execute once)
-    - script          (execute the number of samples times)
-    - after_script    (execute once)
-  You could set "before_script" or "after_script" to empty string, meaning
-  not executing.
-  You have to run your program in "script" with standard input/output (no
-  need to redirect).
-
-  You can insert some placeholders in your scripts. When execute a script,
-  cf will replace all placeholders by following rules:
-
-  $%path%$   Path to source file (Excluding $%full%$, e.g. "/home/xalanq/")
-  $%full%$   Full name of source file (e.g. "a.cpp")
-  $%file%$   Name of source file (Excluding suffix, e.g. "a")
-  $%rand%$   Random string with 8 character (including "a-z" "0-9")
+```bash
+cf race 1136                    # Start contest 1136
+cd ./cf/contest/1136/a          # Enter problem A directory
+cf gen                          # Generate code from template
+vim a.cpp                       # Write your solution
+cf test                         # Compile and test samples
+cf submit                       # Submit your code
+cf list                         # View problem stats
+cf stand                        # Open standings in browser
 ```
 
-## Template Example
+### Commands
 
-The placeholders inside the template will be replaced with the corresponding content when you run `cf gen`.
+| Command | Description |
+|---------|-------------|
+| `cf config` | Configure handle, password, and templates |
+| `cf submit [-f <file>] [<specifier>...]` | Submit solution |
+| `cf list [<specifier>...]` | List problem stats |
+| `cf parse [<specifier>...]` | Fetch problem samples |
+| `cf gen [<alias>]` | Generate code from template |
+| `cf test [<file>]` | Compile and test locally |
+| `cf watch [all] [<specifier>...]` | Watch submission status |
+| `cf open [<specifier>...]` | Open problem in browser |
+| `cf stand [<specifier>...]` | Open standings in browser |
+| `cf sid [<specifier>...]` | Open submission page |
+| `cf race [<specifier>...]` | Start racing a contest |
+| `cf pull [ac] [<specifier>...]` | Pull submitted code |
+| `cf clone [ac] [<handle>]` | Clone someone's submissions |
+| `cf upgrade` | Upgrade cf-tool |
 
+### Specifiers
+
+Specifiers let you identify contests/problems flexibly:
+- URLs: `https://codeforces.com/contest/100`, `https://codeforces.com/contest/180/problem/A`
+- IDs: `1111A`, `1111`, `a`
+- Groups: `https://codeforces.com/group/Cw4JRyRGXR/contest/269760`, `Cw4JRyRGXR`
+
+### Examples
+
+```bash
+# Submitting
+cf submit                              # Auto-detect file
+cf submit -f a.cpp 100 a               # Specific file and problem
+cf submit gym 100001 a                 # Gym submission
+
+# Parsing samples
+cf parse 100                           # All problems from contest 100
+cf parse gym 100001a                   # Specific gym problem
+
+# Pulling code
+cf pull ac 100 a                       # Pull accepted code
+cf clone xalanq                        # Clone all of xalanq's code
 ```
-$%U%$   Handle (e.g. xalanq)
-$%Y%$   Year   (e.g. 2019)
-$%M%$   Month  (e.g. 04)
-$%D%$   Day    (e.g. 09)
-$%h%$   Hour   (e.g. 08)
-$%m%$   Minute (e.g. 05)
-$%s%$   Second (e.g. 00)
-```
+
+## Templates
+
+### Template Placeholders
+
+Use these placeholders in your template code - they'll be replaced when running `cf gen`:
+
+| Placeholder | Value |
+|------------|-------|
+| `$%U%$` | Handle (e.g. xalanq) |
+| `$%Y%$` | Year (e.g. 2019) |
+| `$%M%$` | Month (e.g. 04) |
+| `$%D%$` | Day (e.g. 09) |
+| `$%h%$` | Hour (e.g. 08) |
+| `$%m%$` | Minute (e.g. 05) |
+| `$%s%$` | Second (e.g. 00) |
+
+### Example Template
 
 ```cpp
-/* Generated by powerful Codeforces Tool
- * You can download the binary file in here https://github.com/xalanq/cf-tool (Windows, macOS, Linux)
+/* Generated by Codeforces Tool
+ * https://github.com/xalanq/cf-tool
  * Author: $%U%$
  * Time: $%Y%$-$%M%$-$%D%$ $%h%$:$%m%$:$%s%$
-**/
+ */
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -269,24 +149,40 @@ int main() {
 }
 ```
 
+### Script Placeholders
+
+These placeholders work in template scripts (before_script, script, after_script):
+
+| Placeholder | Value |
+|------------|-------|
+| `$%path%$` | Path to source file (e.g. `/home/xalanq/`) |
+| `$%full%$` | Full filename (e.g. `a.cpp`) |
+| `$%file%$` | Filename without extension (e.g. `a`) |
+| `$%rand%$` | Random 8-character string (a-z, 0-9) |
+
+## Data Files
+
+cf-tool stores data in your home directory:
+
+| File | Contents |
+|------|----------|
+| `~/.cf/config` | Configuration (templates, etc.) |
+| `~/.cf/session` | Session data (cookies, credentials) |
+
 ## FAQ
 
 ### I double click the program but it doesn't work
 
-Codeforces Tool is a command-line tool. You should run it in terminal.
+cf-tool is a command-line tool. Run it in your terminal.
 
-### I cannot use `cf` command
+### I cannot use the `cf` command
 
-You should put the `cf` program to a path (e.g. `/usr/bin/` in Linux) which has been added to system environment variable PATH.
-
-Or just google "how to add a path to system environment variable PATH".
+Add the `cf` binary to a directory in your PATH (e.g. `/usr/bin/` on Linux), or add its directory to your PATH environment variable.
 
 ### How to add a new testcase
 
-Create two extra testcase files `inK.txt` and `ansK.txt` (K is a string with 0~9).
+Create `inK.txt` and `ansK.txt` files where K is any string of digits (0-9).
 
-### Enable tab completion in terminal
+### Enable tab completion
 
-Use this [Infinidat/infi.docopt_completion](https://github.com/Infinidat/infi.docopt_completion).
-
-Note: If there is a new version released (especially a new command added), you should run `docopt-completion cf` again.
+Use [Infinidat/infi.docopt_completion](https://github.com/Infinidat/infi.docopt_completion). Run `docopt-completion cf` after each update that adds new commands.
